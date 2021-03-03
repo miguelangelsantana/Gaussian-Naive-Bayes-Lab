@@ -17,10 +17,162 @@ To get started, load the dataset stored in the file `'heart.csv'`. The dataset c
 
 
 ```python
-# Your code here 
 # Load the dataset
+import pandas as pd
 
+df = pd.read_csv('heart.csv')
+df.head()
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>sex</th>
+      <th>cp</th>
+      <th>trestbps</th>
+      <th>chol</th>
+      <th>fbs</th>
+      <th>restecg</th>
+      <th>thalach</th>
+      <th>exang</th>
+      <th>oldpeak</th>
+      <th>slope</th>
+      <th>ca</th>
+      <th>thal</th>
+      <th>target</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>63</td>
+      <td>1</td>
+      <td>3</td>
+      <td>145</td>
+      <td>233</td>
+      <td>1</td>
+      <td>0</td>
+      <td>150</td>
+      <td>0</td>
+      <td>2.3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>37</td>
+      <td>1</td>
+      <td>2</td>
+      <td>130</td>
+      <td>250</td>
+      <td>0</td>
+      <td>1</td>
+      <td>187</td>
+      <td>0</td>
+      <td>3.5</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>41</td>
+      <td>0</td>
+      <td>1</td>
+      <td>130</td>
+      <td>204</td>
+      <td>0</td>
+      <td>0</td>
+      <td>172</td>
+      <td>0</td>
+      <td>1.4</td>
+      <td>2</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>56</td>
+      <td>1</td>
+      <td>1</td>
+      <td>120</td>
+      <td>236</td>
+      <td>0</td>
+      <td>1</td>
+      <td>178</td>
+      <td>0</td>
+      <td>0.8</td>
+      <td>2</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>57</td>
+      <td>0</td>
+      <td>0</td>
+      <td>120</td>
+      <td>354</td>
+      <td>0</td>
+      <td>1</td>
+      <td>163</td>
+      <td>1</td>
+      <td>0.6</td>
+      <td>2</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+# Optional but always recommended; briefly explore your dataset
+pd.plotting.scatter_matrix(df, figsize=(10,10)); 
+```
+
+
+```python
+# Optional but always recommended; briefly explore your dataset
+df['target'].value_counts() 
+```
+
+
+
+
+    1    165
+    0    138
+    Name: target, dtype: int64
+
+
 
 ## Define the problem
 
@@ -29,6 +181,8 @@ As discussed, the dataset contains various patient measurements along with a `'t
 
 ```python
 # Your code here
+X = df[[col for col in df.columns if col != 'target']]
+y = df['target']
 ```
 
 ## Perform a Train-test split
@@ -39,9 +193,9 @@ While not demonstrated in the previous lesson, you've seen from your work with r
 
 
 ```python
-# Your code here
 # Perform a train-test split 
-
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=22)
 ```
 
 ## Calculate the mean & standard deviation of each feature for each class in the training set
@@ -50,10 +204,153 @@ Now, calculate the mean and standard deviation for each feature within each of t
 
 
 ```python
-# Your code here 
 # Calculate the mean and standard deviation for each feature within each class for the training set
-
+train = pd.concat([X_train, y_train], axis=1)
+aggs = train.groupby('target').agg(['mean', 'std'])
+aggs
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+
+    .dataframe thead tr:last-of-type th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="2" halign="left">age</th>
+      <th colspan="2" halign="left">sex</th>
+      <th colspan="2" halign="left">cp</th>
+      <th colspan="2" halign="left">trestbps</th>
+      <th colspan="2" halign="left">chol</th>
+      <th>...</th>
+      <th colspan="2" halign="left">exang</th>
+      <th colspan="2" halign="left">oldpeak</th>
+      <th colspan="2" halign="left">slope</th>
+      <th colspan="2" halign="left">ca</th>
+      <th colspan="2" halign="left">thal</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>mean</th>
+      <th>std</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>...</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>mean</th>
+      <th>std</th>
+    </tr>
+    <tr>
+      <th>target</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>57.281553</td>
+      <td>8.009085</td>
+      <td>0.796117</td>
+      <td>0.404853</td>
+      <td>0.466019</td>
+      <td>0.916253</td>
+      <td>134.067961</td>
+      <td>18.919469</td>
+      <td>251.543689</td>
+      <td>52.341596</td>
+      <td>...</td>
+      <td>0.543689</td>
+      <td>0.500523</td>
+      <td>1.600971</td>
+      <td>1.310253</td>
+      <td>1.184466</td>
+      <td>0.555676</td>
+      <td>1.213592</td>
+      <td>1.025656</td>
+      <td>2.582524</td>
+      <td>0.602678</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>52.322581</td>
+      <td>9.995567</td>
+      <td>0.564516</td>
+      <td>0.497832</td>
+      <td>1.427419</td>
+      <td>0.972578</td>
+      <td>129.137097</td>
+      <td>16.589415</td>
+      <td>240.516129</td>
+      <td>46.683240</td>
+      <td>...</td>
+      <td>0.161290</td>
+      <td>0.369291</td>
+      <td>0.592742</td>
+      <td>0.749544</td>
+      <td>1.580645</td>
+      <td>0.612827</td>
+      <td>0.354839</td>
+      <td>0.818422</td>
+      <td>2.072581</td>
+      <td>0.444906</td>
+    </tr>
+  </tbody>
+</table>
+<p>2 rows × 26 columns</p>
+</div>
+
+
 
 ## Define a function to calculate the point estimate for the conditional probability of a feature value for a given class
 
@@ -66,7 +363,25 @@ Recall that the point estimate is given by the probability density function of t
 
 ```python
 # Your code here
+from scipy import stats
+def p_x_given_class(obs_row, feature, class_):
+    mu = aggs[feature]['mean'][class_]
+    std = aggs[feature]['std'][class_]
+    
+    # Observation
+    obs = obs_row[feature] 
+    
+    p_x_given_y = stats.norm.pdf(obs, loc=mu, scale=std)
+    return p_x_given_y
+p_x_given_class(X_train.iloc[0], X.columns[0], 0)
 ```
+
+
+
+
+    0.035036938123834606
+
+
 
 ## Define a prediction function 
 
@@ -75,13 +390,37 @@ Define a prediction function that will return a predicted class value for a part
 
 ```python
 # Your code here
+import numpy as np
+def predict_class(obs_row):
+    c_probs = []
+    for c in range(2):
+        # Initialize probability to relative probability of class
+        p = len(y_train[y_train == c])/len(y_train) 
+        for feature in X.columns:
+            p *= p_x_given_class(obs_row, feature, c)
+        c_probs.append(p)
+    return np.argmax(c_probs)
 ```
+
+
+```python
+predict_class(X_train.iloc[0])
+```
+
+
+
+
+    0
+
+
 
 ## Apply your prediction function to the training and test sets
 
 
 ```python
 # Your code here
+y_hat_train = [predict_class(X_train.iloc[idx]) for idx in range(len(X_train))]
+y_hat_test = [predict_class(X_test.iloc[idx]) for idx in range(len(X_test))]
 ```
 
 ## Calculate the training and test accuracy
@@ -89,7 +428,16 @@ Define a prediction function that will return a predicted class value for a part
 
 ```python
 # Your code here
+residuals_train = y_hat_train == y_train
+acc_train = residuals_train.sum()/len(residuals_train)
+
+residuals_test = y_hat_test == y_test
+acc_test = residuals_test.sum()/len(residuals_test)
+print('Training Accuracy: {}\tTesting Accuracy: {}'.format(acc_train, acc_test))
 ```
+
+    Training Accuracy: 0.8502202643171806	Testing Accuracy: 0.8289473684210527
+
 
 ## Level up (Optional)
 
@@ -110,11 +458,21 @@ With that, write such a function below:
 ```python
 def p_band_x_given_class(obs_row, feature, c, range_width_std):
     """obs_row is the observation in question 
-    feature is the feature of the observation row for which you are calculating a conditional probability 
-    c is the class flag for the conditional probability 
+    feature is the feature of the observation row for which you are calculating a conditional probability
+    c is the class flag for the conditional probability
     range_width_std is the range in standard deviations of the feature variable to calculate the integral under the PDF curve for"""
-    # Your code here 
     
+    mu = aggs[feature]['mean'][c]
+    std = aggs[feature]['std'][c]
+    
+    # observation
+    obs = obs_row[feature] 
+    interval_min = obs - range_width_std*std/2
+    interval_max = obs + range_width_std*std/2
+    
+    cdf_min = stats.norm.cdf(interval_min, loc=mu, scale=std)
+    cdf_max = stats.norm.cdf(interval_max, loc=mu, scale=std)
+    p_x_given_y = cdf_max - cdf_min
     return p_x_given_y
 ```
 
@@ -124,9 +482,19 @@ Now, update the `predict_class()` function to use this new conditional probabili
 
 
 ```python
-# Your code here
 # Update the prediction function
-
+def predict_class(obs_row, how='bands', range_width_std=.25):
+    c_probs = []
+    for c in range(2):
+        # Initialize probability to relative probability of class
+        p = len(y_train[y_train == c])/len(y_train) 
+        for feature in X.columns:
+            if how == 'bands':
+                p *= p_band_x_given_class(obs_row, feature, c, range_width_std=range_width_std)
+            else:
+                p *= p_x_given_class(obs_row, feature, c)
+        c_probs.append(p)
+    return np.argmax(c_probs)
 ```
 
 ## Experiment with the impact of various range-widths
@@ -138,8 +506,34 @@ _Note:_ ⏰ _Expect your code to take over two minutes to run._
 
 ```python
 # Your code here
+import matplotlib.pyplot as plt
+%matplotlib inline
+train_accs = []
+test_accs = []
+range_stds = np.linspace(0.1, 2, num=21)
+for range_std in range_stds:    
+    y_hat_train = [predict_class(X_train.iloc[idx], range_width_std=range_std) for idx in range(len(X_train))]
+    y_hat_test = [predict_class(X_test.iloc[idx], range_width_std=range_std) for idx in range(len(X_test))]
+    
+    residuals_train = y_hat_train == y_train
+    acc_train = residuals_train.sum()/len(residuals_train)
 
+    residuals_test = y_hat_test == y_test
+    acc_test = residuals_test.sum()/len(residuals_test)
+    
+    train_accs.append(acc_train)
+    test_accs.append(acc_test)
+plt.plot(range_stds, train_accs, label='Train Accuracy')
+plt.plot(range_stds, test_accs, label='Test Accuracy')
+plt.title('Train and Test Accruaccy Versus Various Standard Deviation Bin Ranges for GNB')
+plt.ylabel('Classifier Accuracy')
+plt.xlabel('Standard Deviations Used for Integral Band Width')
+plt.legend(loc=(1.01,.85));
 ```
+
+
+![png](index_files/index_24_0.png)
+
 
 > Comment: Not a wild difference from our point estimates obtained by using points from the PDF itself, but there is some impact. **Interestingly, these graphs will differ substantially in shape depending on the initial train-test split used.** The recommendation would be to use the point estimates from the PDF itself, or a modest band-width size.
 
@@ -153,6 +547,15 @@ temp = df[df['target'] == 1]['trestbps']
 aggs = temp.agg(['mean', 'std'])
 aggs
 ```
+
+
+
+
+    mean    129.303030
+    std      16.169613
+    Name: trestbps, dtype: float64
+
+
 
 
 ```python
@@ -191,6 +594,20 @@ plt.title('Conditional Probability of Resting Blood Pressure ~145 for Those With
 plt.ylabel('Probability Density')
 plt.xlabel('Resting Blood Pressure')
 ```
+
+    Probability of Blood Pressure Falling withing Range for the Given Class: 0.03080251623846908
+
+
+
+
+
+    Text(0.5, 0, 'Resting Blood Pressure')
+
+
+
+
+![png](index_files/index_29_2.png)
+
 
 > Comment: See https://matplotlib.org/gallery/showcase/integral.html for further details on plotting shaded integral areas under curves.
 
